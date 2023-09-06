@@ -7,6 +7,7 @@ from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from datastructures import FamilyStructure
 #from models import Person
+import json
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -36,7 +37,31 @@ def handle_hello():
     }
 
 
-    return jsonify(response_body), 200
+    return jsonify(members), 200
+
+@app.route('/member/<int:member_id>', methods=['GET'])
+def get_single_member(member_id):
+
+    # this is how you can use the Family datastructure by calling its methods
+    member = jackson_family.get_member(member_id)
+    return jsonify(member), 200
+
+@app.route('/member', methods=['POST'])
+def add_member():
+    try:
+    # this is how you can use the Family datastructure by calling its methods
+        new_member = json.loads(request.data)
+        jackson_family.add_member(new_member)
+        return jsonify(new_member), 200
+    except:
+         return jsonify({"error":"bad request"}), 400
+    
+@app.route('/member/<int:member_id>', methods=['DELETE'])
+def delete_member(member_id):
+
+    # this is how you can use the Family datastructure by calling its methods
+    member = jackson_family.delete_member(member_id)
+    return jsonify({"done": True}), 200
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
